@@ -1,5 +1,8 @@
 import tkinter as tk
+from tkinter import filedialog
 from Page import *
+import json
+from Script import *
 
 listOption = ["LearnImage", "Kanji", "KanjiV2"]
 
@@ -7,31 +10,247 @@ class PageGenScript(Page):
    def __init__(self, *args, **kwargs):
         Page.__init__(self, *args, **kwargs)
 
-        labelProgramFile = tk.LabelFrame(self, text="Program file")
-        labelProgramFile.grid(row = 0, column = 0, padx=10,  pady=10, ipadx=2, ipady=2)
+        self.labelProgramFile = tk.LabelFrame(self, text="Program file")
+        self.labelProgramFile.grid(row = 0, column = 0, padx=10,  pady=10, ipadx=2, ipady=2)
 
-        entry = tk.Entry(labelProgramFile,  width=60)
-        entry.grid(row = 0, column = 0, pady = 5, padx = 5)
+        self.entry = tk.Entry(self.labelProgramFile,  width=60)
+        self.entry.grid(row = 0, column = 0, pady = 5, padx = 5)
 
-        btnBrowse = tk.Button(labelProgramFile, text = "Browse...", width=13, height=1)
-        btnBrowse.grid(row = 0, column = 1)
+        self.btnBrowse = tk.Button(self.labelProgramFile, text = "Browse...", width=13, height=1, command = self.openFile)
+        self.btnBrowse.grid(row = 0, column = 1)
 
-        btnStart = tk.Button(labelProgramFile, text = "Start", font=('calibre', 15, 'bold'), width=20, height=1)
-        btnStart.grid(row = 1, column = 0)
+        self.btnStart = tk.Button(self.labelProgramFile, text = "Start", font=('calibre', 15, 'bold'), width=30, height=1, command = self.parseFile)
+        self.btnStart.grid(row = 1, column = 0)
 
-        clicked = tk.StringVar()
-        clicked.set(listOption[0])
+        self.clicked = tk.StringVar()
+        self.clicked.set(listOption[2])
 
-        optGen = tk.OptionMenu(labelProgramFile, clicked , *listOption)
-        optGen.config(width=10)
-        optGen.grid(row = 1, column = 1, sticky = "n")
+        self.optGen = tk.OptionMenu(self.labelProgramFile, self.clicked , *listOption)
+        self.optGen.config(width=10)
+        self.optGen.grid(row = 1, column = 1, sticky = "n")
 
-        labelProgramLog = tk.LabelFrame(self, text="Log")
-        labelProgramLog.grid(row = 1, column = 0, ipadx=2, ipady=2)
+        self.labelProgramLog = tk.LabelFrame(self, text="Log")
+        self.labelProgramLog.grid(row = 1, column = 0, ipadx=2, ipady=2)
 
-        logText = tk.Text(labelProgramLog, width=59, height=10, state="normal")
-        logText.grid(row = 0, column = 0, columnspan = 3,  padx=5,  pady=5)
-        logText.tag_configure("green_text", foreground="green", font=("calibre", 11 ,"bold"))
+        self.logText = tk.Text(self.labelProgramLog, width=59, height=10, state="normal")
+        self.logText.grid(row = 0, column = 0, columnspan = 3,  padx=5,  pady=5)
+        self.logText.tag_configure("green_text", foreground="green", font=("calibre", 11 ,"bold"))
 
-        btnClear = tk.Button(labelProgramLog, text = "Clear", font=('calibre', 10), width = 6)
-        btnClear.grid(row = 1, column = 0, sticky="w", padx = 3)
+        self.btnClear = tk.Button(self.labelProgramLog, text = "Clear", font=('calibre', 10), width = 6, command = self.clearLog)
+        self.btnClear.grid(row = 1, column = 0, sticky="w", padx = 3)
+
+   def openFile(self):
+      filePath = filedialog.askopenfilename(title="Choose file",
+                                           filetypes=(("Json", "*.json"),))
+      if filePath:
+         self.entry.delete(0, tk.END)
+         self.entry.insert(0, filePath)
+      else:
+         self.logText.insert(tk.END, "File is not exit\n")
+
+   def clearLog(self):
+      self.logText.delete("1.0", tk.END)
+
+   def parseFile(self):
+      pathFile = self.entry.get()
+      if pathFile:
+         self.logText.insert(tk.END, pathFile+"\n")
+         if self.clicked.get() == listOption[0]:  # LearnImage
+            self.genScriptForLeanImage(pathFile)
+         elif self.clicked.get() == listOption[1]: #Kanji
+            self.genScriptForKanji(pathFile)
+         elif self.clicked.get() == listOption[2]: #KanjiV2
+            self.genScriptForKanjiV2(pathFile)
+         else:
+            return
+      else:
+         self.logText.insert(tk.END, "File is not exit\n")
+         return
+
+   def genScriptForLeanImage(self, pathFile):
+      dictSaveFile = pathFile.rsplit('/', 1)[0] + "/index.html"
+      # Read data from JSON file
+      try:
+         with open(pathFile, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+         title = data.get("title", "")
+         vocabulary = data["vocabulary"]
+
+         # Initialize script with title
+         script = ScrtipLearnImage.header.replace("<title></title>", f"<title>{title}</title>")
+
+         # Add flashcards from vocabulary
+         for item in vocabulary:
+            item_script = ScrtipLearnImage.bodyFlashcard.replace(
+               '<img src="Images/.png"/>', f'<img src="Images/{item["img"]}.png"/>'
+            ).replace(
+               '<p class="japan"></p>', f'<p class="japan">{item["japan"]}</p>'
+            ).replace(
+               '<p class="romaji">//</p>', f'<p class="romaji">/{item["romaji"]}/</p>'
+            ).replace(
+               '<p class="mean"></p>', f'<p class="mean">{item["mean"]}</p>'
+            )
+            script += item_script
+
+         # End script
+         script += ScrtipLearnImage.bodyEnd
+
+         # Write the entire script to file
+         with open(dictSaveFile, "w", encoding="utf-8") as index:
+            index.write(script)
+
+         # Log result
+         self.logText.insert(tk.END, "Successful!!!\n", "green_text")
+         self.logText.insert(tk.END, f"Save here: {dictSaveFile}\n")
+
+      except KeyError as e:
+          # Log error
+          self.logText.insert(tk.END, f"KeyError: {str(e)}\n")
+
+   def genScriptForKanji(self, pathFile):
+      dictSaveFile = pathFile.rsplit('/', 1)[0] + "/index.html"
+
+      # Read data from json file
+      try:
+         with open(pathFile, 'r', encoding='utf-8') as file:
+             data = json.load(file)
+
+         # Initialize script with title
+         title = data.get("title", "")
+         script = ScriptKanji.header.replace("<title></title>", f"<title>{title}</title>")
+         vocabulary = data["vocabulary"]
+
+         # Add vocabulary parts to script
+         for i, item in enumerate(vocabulary, start=1):
+            item_script = ScriptKanji.bodyNewWord.replace(
+               "START NEW WORD", f"START {i} NEW WORD"
+            ).replace(
+               "おん", item["on"]
+            ).replace(
+               '<img src="../../GIF/kanji/gif/150x150/.gif" class="border_all"/>',
+               f'<img src="../../GIF/kanji/gif/150x150/{item["image"]}.gif" class="border_all"/>'
+            ).replace(
+               "contentVietnam", item["content"]
+            ).replace(
+               "くん", item["kun"]
+            )
+            item_script += ScriptKanji.bodyStartOnKun
+            # Add onKanji flashcards to item_script
+            for y, on in enumerate(item.get("onKanji", []), start=1):
+               flashcard_script = ScriptKanji.bodyFlashCard.replace(
+                  "<!-- START WORD-->", f"<!-- START {y} WORD-->"
+               ).replace(
+                  '<p class="japan">1</p>', f'<p class="japan">{on["japan"]}</p>'
+               ).replace(
+                  '<p class="japan">2</p>', f'<p class="japan">{on["hiragana"]}</p>'
+               ).replace(
+                  '<p class="romaji"></p>', f'<p class="romaji">{on["romaji"]}</p>'
+               ).replace(
+                  '</div> <!-- END WORD-->' , f'</div> <!-- END {y} WORD-->'
+               )
+               item_script += flashcard_script
+            item_script += ScriptKanji.bodyEndOn
+
+            item_script += ScriptKanji.bodySatrtKun
+            # Add onKanji flashcards to item_script
+            if item.get("kun", ""):
+               for y, on in enumerate(item.get("kunKanji", []), start=1):
+                  flashcard_script = ScriptKanji.bodyFlashCard.replace(
+                     "<!-- START WORD-->", f"<!-- START {y} WORD-->"
+                  ).replace(
+                     '<p class="japan">1</p>', f'<p class="japan">{on["japan"]}</p>'
+                  ).replace(
+                     '<p class="japan">2</p>', f'<p class="japan">{on["hiragana"]}</p>'
+                  ).replace(
+                     '<p class="romaji"></p>', f'<p class="romaji">{on["romaji"]}</p>'
+                  ).replace(
+                     '</div> <!-- END WORD-->' , f'</div> <!-- END {y} WORD-->'
+                  )
+                  item_script += flashcard_script
+            item_script += ScriptKanji.bodyEndOnKun
+            item_script += ScriptKanji.bodyNewWordEnd.replace(
+               'END NEW WORD', f'END {i} NEW WORD'
+            )
+            script += item_script
+
+         script += ScriptKanji.bodyEnd
+         # Write the entire script to file
+         with open(dictSaveFile, "w", encoding="utf-8") as index:
+             index.write(script)
+
+         # Log result
+         self.logText.insert(tk.END, "Successful!!!\n", "green_text")
+         self.logText.insert(tk.END, f"Save here: {dictSaveFile}\n")
+
+      except KeyError as e:
+          # Log error
+          self.logText.insert(tk.END, f"KeyError: {str(e)}\n")
+
+   def genScriptForKanjiV2(self, pathFile):
+      dictSaveFile = pathFile.rsplit('/', 1)[0] + "/index.html"
+
+      # Read data from json file
+      try:
+         with open(pathFile, 'r', encoding='utf-8') as file:
+             data = json.load(file)
+
+         # Initialize script with title
+         title = data.get("title", "")
+         script = ScriptKanjiV2.header.replace("<title></title>", f"<title>{title}</title>")
+
+         vocabulary = data["vocabulary"]
+         for y, item in enumerate(vocabulary, start=0):
+            japan = list(item["japan"])
+            item_script = None
+            if len(japan) == 1:
+               item_script = ScriptKanjiV2.bodySwipper1.replace(
+                  '<img src="../../GIF/kanji/gif/150x150/.gif" class="border_all" />',
+                  f'<img src="../../GIF/kanji/gif/150x150/{japan[0]}.gif" class="border_all" />'
+               )
+            elif len(japan) == 2:
+               item_script = ScriptKanjiV2.bodySwipper2.replace(
+                  'src="../../GIF/kanji/gif/150x150/1.gif"',
+                  f'src="../../GIF/kanji/gif/150x150/{japan[0]}.gif"'
+               ).replace (
+                  'src="../../GIF/kanji/gif/150x150/2.gif"',
+                  f'src="../../GIF/kanji/gif/150x150/{japan[1]}.gif"'
+               )
+            elif len(japan) == 3:
+               item_script = ScriptKanjiV2.bodySwipper3.replace(
+                  'src="../../GIF/kanji/gif/150x150/1.gif"',
+                  f'src="../../GIF/kanji/gif/150x150/{japan[0]}.gif"'
+               ).replace(
+                  'src="../../GIF/kanji/gif/150x150/2.gif"',
+                  f'src="../../GIF/kanji/gif/150x150/{japan[1]}.gif"'
+               ).replace(
+                  'src="../../GIF/kanji/gif/150x150/3.gif"',
+                  f'src="../../GIF/kanji/gif/150x150/{japan[2]}.gif"'
+               )
+            else:
+               self.logText.insert(tk.END, f"Japanese length in Json haven't supported")
+               return
+
+            if y != 0:
+               item_script = item_script.replace(
+                  '<div class="swiper-slide slide">',
+                  f'<div class="swiper-slide slide{y}">'
+               ).replace(
+                  '<button class="open_button slide" type="button">Help</button>',
+                  f'<button class="open_button slide{y}" type="button">Help</button>'
+               )
+            script += item_script
+
+         script += ScriptKanjiV2.bodyEnd
+
+         # Write the entire script to file
+         with open(dictSaveFile, "w", encoding="utf-8") as index:
+             index.write(script)
+
+         # Log result
+         self.logText.insert(tk.END, "Successful!!!\n", "green_text")
+         self.logText.insert(tk.END, f"Save here: {dictSaveFile}\n")
+
+      except KeyError as e:
+         # Log error
+         self.logText.insert(tk.END, f"KeyError: {str(e)}\n")

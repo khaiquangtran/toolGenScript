@@ -1,0 +1,52 @@
+{
+	"title" : "第四十二課",
+	"vocabulary" :
+	[
+		{
+			"on" : "on",
+			"image" : "味",
+			"content" : "Viet",
+			"kun" : "kun",
+			"onKanji" :
+			[
+				{
+				"japan" : "japan",
+				"hiragana" : "hiragana",
+				"romaji" : "romaji"
+				},
+				{
+				"japan" : "japan1",
+				"hiragana" : "hiragana1",
+				"romaji" : "romaji1"
+				}
+			],
+			"kunKanji" :
+			[
+				{
+				"japan" : "japan2",
+				"hiragana" : "hiragana2",
+				"romaji" : "romaji2"
+				},
+				{
+				"japan" : "japan3",
+				"hiragana" : "hiragana3",
+				"romaji" : "romaji13"
+				}
+			]
+		},
+		{
+			"on" : "on1",
+			"image" : "味",
+			"content" : "Nam",
+			"kun" : "",
+			"onKanji" :
+			[
+				{
+				"japan" : "japan5",
+				"hiragana" : "hiragana5",
+				"romaji" : "romaji5"
+				}
+			]
+		}
+	]
+}
