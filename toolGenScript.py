@@ -28,7 +28,7 @@ class MainView(tk.Frame):
         self.b2.pack(side="left")
 
         # Show the first page by default
-        self.p2.show()
+        self.p1.show()
 
 if __name__ == "__main__":
     root = tk.Tk()

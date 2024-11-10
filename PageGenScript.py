@@ -23,7 +23,7 @@ class PageGenScript(Page):
         self.btnStart.grid(row = 1, column = 0)
 
         self.clicked = tk.StringVar()
-        self.clicked.set(listOption[2])
+        self.clicked.set(listOption[0])
 
         self.optGen = tk.OptionMenu(self.labelProgramFile, self.clicked , *listOption)
         self.optGen.config(width=10)
