@@ -266,16 +266,16 @@ class ScriptKanjiV2:
 """
     bodyEnd = """
             </div>
-                <div class="box">
-                    <p class="heading">Help</p>
-                    <div class="message_box">
-                        <p class="message"></p>
-                        <p class="mean"></p>
-                        <div class="button_box">
-                            <button class="close_button" type="button">OK</button>
-                        </div>
+            <div class="box">
+                <p class="heading">Help</p>
+                <div class="message_box">
+                    <p class="message"></p>
+                    <p class="mean"></p>
+                    <div class="button_box">
+                        <button class="close_button" type="button">OK</button>
                     </div>
                 </div>
+            </div>
     </div>
     <div class="footer">
         <img src="https://hitwebcounter.com/counter/counter.php?page=11583648&style=0006&nbdigits=7&type=page&initCount=0"
