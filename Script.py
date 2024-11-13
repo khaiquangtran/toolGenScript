@@ -4,7 +4,7 @@ class ScrtipLearnImage:
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>第四十二課</title>
+        <title></title>
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -73,7 +73,7 @@ class ScriptKanji:
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>第四十三課</title>
+        <title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- Link Swiper's CSS -->
         <link rel="stylesheet" href="../../Swiper/swiper-bundle.min.css" />
@@ -179,7 +179,7 @@ class ScriptKanjiV2:
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>第十八課</title>
+        <title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <!-- Link Swiper's CSS -->
         <link rel="stylesheet" href="../../Swiper/swiper-bundle.min.css" />
