@@ -210,9 +210,6 @@ class ScriptKanjiV2:
             </button></a
           >
         </div>
-        <!-- <div>
-          <p class="title">第一課</p>
-        </div> -->
 
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
