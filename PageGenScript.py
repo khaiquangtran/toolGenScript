@@ -35,6 +35,7 @@ class PageGenScript(Page):
         self.logText = tk.Text(self.labelProgramLog, width=59, height=10, state="normal")
         self.logText.grid(row = 0, column = 0, columnspan = 3,  padx=5,  pady=5)
         self.logText.tag_configure("green_text", foreground="green", font=("calibre", 11 ,"bold"))
+        self.logText.tag_configure("red_text", foreground="red", font=("calibre", 11 ,"bold"))
 
         self.btnClear = tk.Button(self.labelProgramLog, text = "Clear", font=('calibre', 10), width = 6, command = self.clearLog)
         self.btnClear.grid(row = 1, column = 0, sticky="w", padx = 3)
@@ -82,12 +83,28 @@ class PageGenScript(Page):
 
          # Add flashcards from vocabulary
          for item in vocabulary:
-            item_script = ScrtipLearnImage.bodyFlashcard.replace(
+            item_script = ScrtipLearnImage.bodyFlashcard
+
+            if len(item["japan"]) >= 7 and len(item["japan"]) <= 9:
+               item_script = item_script.replace(
+                  '<p class="japan"></p>', f'<p class="japan8">{item["japan"]}</p>'
+               )
+            else:
+               item_script = item_script.replace(
+                  '<p class="japan"></p>', f'<p class="japan">{item["japan"]}</p>'
+               )
+
+            if len(item["romaji"]) >= 13 and len(item["romaji"]) <= 15:
+               item_script = item_script.replace(
+                  '<p class="romaji">//</p>', f'<p class="romaji2">/{item["romaji"]}/</p>'
+               )
+            else:
+               item_script = item_script.replace(
+                  '<p class="romaji">//</p>', f'<p class="romaji">/{item["romaji"]}/</p>'
+               )
+
+            item_script = item_script.replace(
                '<img src="Images/.png"/>', f'<img src="Images/{item["img"]}.png"/>'
-            ).replace(
-               '<p class="japan"></p>', f'<p class="japan">{item["japan"]}</p>'
-            ).replace(
-               '<p class="romaji">//</p>', f'<p class="romaji">/{item["romaji"]}/</p>'
             ).replace(
                '<p class="mean"></p>', f'<p class="mean">{item["mean"]}</p>'
             )
@@ -106,7 +123,7 @@ class PageGenScript(Page):
 
       except KeyError as e:
           # Log error
-          self.logText.insert(tk.END, f"KeyError: {str(e)}\n")
+          self.logText.insert(tk.END, f"KeyError: {str(e)}\n", "red_text")
 
    def genScriptForKanji(self, pathFile):
       dictSaveFile = pathFile.rsplit('/', 1)[0] + "/index.html"
@@ -138,12 +155,36 @@ class PageGenScript(Page):
             item_script += ScriptKanji.bodyStartOnKun
             # Add onKanji flashcards to item_script
             for y, on in enumerate(item.get("onKanji", []), start=1):
-               flashcard_script = ScriptKanji.bodyFlashCard.replace(
+               flashcard_script = ScriptKanji.bodyFlashCard
+
+               if len(on["japan"]) == 4:
+                  flashcard_script = flashcard_script.replace(
+                     '<p class="japan">1</p>', f'<p class="japan1 japan">{on["japan"]}</p>'
+                  )
+               elif len(on["japan"]) == 5:
+                  flashcard_script = flashcard_script.replace(
+                     '<p class="japan">1</p>', f'<p class="japan2 japan">{on["japan"]}</p>'
+                  )
+               elif len(on["japan"]) >= 6 and len(on["japan"]) <= 7:
+                  flashcard_script = flashcard_script.replace(
+                     '<p class="japan">1</p>', f'<p class="japan3 japan">{on["japan"]}</p>'
+                  )
+               else:
+                  flashcard_script = flashcard_script.replace(
+                     '<p class="japan">1</p>', f'<p class="japan">{on["japan"]}</p>'
+                  )
+
+               if len(on["hiragana"]) >= 6 and len(on["hiragana"]) <= 9:
+                  flashcard_script = flashcard_script.replace(
+                     '<p class="japan">2</p>', f'<p class="japan1 japan">{on["hiragana"]}</p>'
+                  )
+               else:
+                  flashcard_script = flashcard_script.replace(
+                     '<p class="japan">2</p>', f'<p class="japan">{on["hiragana"]}</p>'
+                  )
+
+               flashcard_script = flashcard_script.replace(
                   "<!-- START WORD-->", f"<!-- START {y} WORD-->"
-               ).replace(
-                  '<p class="japan">1</p>', f'<p class="japan">{on["japan"]}</p>'
-               ).replace(
-                  '<p class="japan">2</p>', f'<p class="japan">{on["hiragana"]}</p>'
                ).replace(
                   '<p class="romaji"></p>', f'<p class="romaji">{on["romaji"]}</p>'
                ).replace(
@@ -156,10 +197,27 @@ class PageGenScript(Page):
             # Add onKanji flashcards to item_script
             if item.get("kun", ""):
                for y, on in enumerate(item.get("kunKanji", []), start=1):
-                  flashcard_script = ScriptKanji.bodyFlashCard.replace(
+                  flashcard_script = ScriptKanji.bodyFlashCard
+
+                  if len(on["japan"]) == 4:
+                     flashcard_script = flashcard_script.replace(
+                        '<p class="japan">1</p>', f'<p class="japan1 japan">{on["japan"]}</p>'
+                     )
+                  elif len(on["japan"]) == 5:
+                     flashcard_script = flashcard_script.replace(
+                        '<p class="japan">1</p>', f'<p class="japan2 japan">{on["japan"]}</p>'
+                     )
+                  elif len(on["japan"]) >= 6 and len(on["japan"]) <= 7:
+                     flashcard_script = flashcard_script.replace(
+                        '<p class="japan">1</p>', f'<p class="japan3 japan">{on["japan"]}</p>'
+                     )
+                  else:
+                     flashcard_script = flashcard_script.replace(
+                        '<p class="japan">1</p>', f'<p class="japan">{on["japan"]}</p>'
+                     )
+
+                  flashcard_script = flashcard_script.replace(
                      "<!-- START WORD-->", f"<!-- START {y} WORD-->"
-                  ).replace(
-                     '<p class="japan">1</p>', f'<p class="japan">{on["japan"]}</p>'
                   ).replace(
                      '<p class="japan">2</p>', f'<p class="japan">{on["hiragana"]}</p>'
                   ).replace(
@@ -185,7 +243,7 @@ class PageGenScript(Page):
 
       except KeyError as e:
           # Log error
-          self.logText.insert(tk.END, f"KeyError: {str(e)}\n")
+          self.logText.insert(tk.END, f"KeyError: {str(e)}\n", "red_text")
 
    def genScriptForKanjiV2(self, pathFile):
       dictSaveFile = pathFile.rsplit('/', 1)[0] + "/index.html"
