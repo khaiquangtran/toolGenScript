@@ -4,50 +4,50 @@ from Page import *
 import json
 from Script import *
 
-listOption = ["LearnImage", "Kanji", "KanjiV2"]
-
 class PageGenScript(Page):
+   LISTOPTION = ["LearnImage", "Kanji", "KanjiV2"]
+
    def __init__(self, *args, **kwargs):
         Page.__init__(self, *args, **kwargs)
 
-        self.labelProgramFile = tk.LabelFrame(self, text="Program file")
-        self.labelProgramFile.grid(row = 0, column = 0, padx=10,  pady=10, ipadx=2, ipady=2)
+        self.labelProgramFile = tk.LabelFrame(self, text = "Program file")
+        self.labelProgramFile.grid(row = 0, column = 0, padx = 10,  pady = 10, ipadx = 2, ipady = 2)
 
-        self.entry = tk.Entry(self.labelProgramFile,  width=60)
+        self.entry = tk.Entry(self.labelProgramFile,  width = 60)
         self.entry.grid(row = 0, column = 0, pady = 5, padx = 5)
 
-        self.btnBrowse = tk.Button(self.labelProgramFile, text = "Browse...", width=13, height=1, command = self.openFile)
+        self.btnBrowse = tk.Button(self.labelProgramFile, text = "Browse...", width = 13, height = 1, command = self.openFile)
         self.btnBrowse.grid(row = 0, column = 1)
 
-        self.btnStart = tk.Button(self.labelProgramFile, text = "Start", font=('calibre', 15, 'bold'), width=30, height=1, command = self.parseFile)
+        self.btnStart = tk.Button(self.labelProgramFile, text = "Start", font=('calibre', 15, 'bold'), width = 30, height = 1, command = self.parseFile)
         self.btnStart.grid(row = 1, column = 0)
 
         self.clicked = tk.StringVar()
-        self.clicked.set(listOption[0])
+        self.clicked.set(self.LISTOPTION[0])
 
-        self.optGen = tk.OptionMenu(self.labelProgramFile, self.clicked , *listOption)
+        self.optGen = tk.OptionMenu(self.labelProgramFile, self.clicked , *self.LISTOPTION)
         self.optGen.config(width=10)
         self.optGen.grid(row = 1, column = 1, sticky = "n")
 
         self.labelProgramLog = tk.LabelFrame(self, text="Log")
-        self.labelProgramLog.grid(row = 1, column = 0, ipadx=2, ipady=2)
+        self.labelProgramLog.grid(row = 1, column = 0, ipadx = 2, ipady = 2)
 
-        self.logText = tk.Text(self.labelProgramLog, width=59, height=10, state="normal")
-        self.logText.grid(row = 0, column = 0, columnspan = 3,  padx=5,  pady=5)
-        self.logText.tag_configure("green_text", foreground="green", font=("calibre", 11 ,"bold"))
-        self.logText.tag_configure("red_text", foreground="red", font=("calibre", 11 ,"bold"))
+        self.logText = tk.Text(self.labelProgramLog, width = 59, height = 10, state = "normal")
+        self.logText.grid(row = 0, column = 0, columnspan = 3,  padx = 5,  pady = 5)
+        self.logText.tag_configure("green_text", foreground = "green", font = ("calibre", 11 ,"bold"))
+        self.logText.tag_configure("red_text", foreground = "red", font = ("calibre", 11 ,"bold"))
 
-        self.btnClear = tk.Button(self.labelProgramLog, text = "Clear", font=('calibre', 10), width = 6, command = self.clearLog)
+        self.btnClear = tk.Button(self.labelProgramLog, text = "Clear", font = ('calibre', 10), width = 6, command = self.clearLog)
         self.btnClear.grid(row = 1, column = 0, sticky="w", padx = 3)
 
    def openFile(self):
-      filePath = filedialog.askopenfilename(title="Choose file",
-                                           filetypes=(("Json", "*.json"),))
+      filePath = filedialog.askopenfilename(title = "Choose file",
+                                           filetypes = (("Json", "*.json"),))
       if filePath:
          self.entry.delete(0, tk.END)
          self.entry.insert(0, filePath)
       else:
-         self.logText.insert(tk.END, "File is not exit\n")
+         self.logText.insert(tk.END, "No file selected!!!\n", "red_text")
 
    def clearLog(self):
       self.logText.delete("1.0", tk.END)
@@ -56,16 +56,16 @@ class PageGenScript(Page):
       pathFile = self.entry.get()
       if pathFile:
          self.logText.insert(tk.END, pathFile+"\n")
-         if self.clicked.get() == listOption[0]:  # LearnImage
+         if self.clicked.get() == self.LISTOPTION[0]:  # LearnImage
             self.genScriptForLeanImage(pathFile)
-         elif self.clicked.get() == listOption[1]: #Kanji
+         elif self.clicked.get() == self.LISTOPTION[1]: #Kanji
             self.genScriptForKanji(pathFile)
-         elif self.clicked.get() == listOption[2]: #KanjiV2
+         elif self.clicked.get() == self.LISTOPTION[2]: #KanjiV2
             self.genScriptForKanjiV2(pathFile)
          else:
             return
       else:
-         self.logText.insert(tk.END, "File is not exit\n")
+         self.logText.insert(tk.END, "File is not exit!!!\n", "red_text")
          return
 
    def genScriptForLeanImage(self, pathFile):
@@ -196,32 +196,39 @@ class PageGenScript(Page):
             item_script += ScriptKanji.bodySatrtKun
             # Add onKanji flashcards to item_script
             if item.get("kun", ""):
-               for y, on in enumerate(item.get("kunKanji", []), start=1):
+               for y, kun in enumerate(item.get("kunKanji", []), start=1):
                   flashcard_script = ScriptKanji.bodyFlashCard
 
-                  if len(on["japan"]) == 4:
+                  if len(kun["japan"]) == 4:
                      flashcard_script = flashcard_script.replace(
-                        '<p class="japan">1</p>', f'<p class="japan1 japan">{on["japan"]}</p>'
+                        '<p class="japan">1</p>', f'<p class="japan1 japan">{kun["japan"]}</p>'
                      )
-                  elif len(on["japan"]) == 5:
+                  elif len(kun["japan"]) == 5:
                      flashcard_script = flashcard_script.replace(
-                        '<p class="japan">1</p>', f'<p class="japan2 japan">{on["japan"]}</p>'
+                        '<p class="japan">1</p>', f'<p class="japan2 japan">{kun["japan"]}</p>'
                      )
-                  elif len(on["japan"]) >= 6 and len(on["japan"]) <= 7:
+                  elif len(kun["japan"]) >= 6 and len(on["japan"]) <= 7:
                      flashcard_script = flashcard_script.replace(
-                        '<p class="japan">1</p>', f'<p class="japan3 japan">{on["japan"]}</p>'
+                        '<p class="japan">1</p>', f'<p class="japan3 japan">{kun["japan"]}</p>'
                      )
                   else:
                      flashcard_script = flashcard_script.replace(
-                        '<p class="japan">1</p>', f'<p class="japan">{on["japan"]}</p>'
+                        '<p class="japan">1</p>', f'<p class="japan">{kun["japan"]}</p>'
+                     )
+
+                  if len(kun["hiragana"]) >= 6 and len(kun["hiragana"]) <= 9:
+                     flashcard_script = flashcard_script.replace(
+                        '<p class="japan">2</p>', f'<p class="japan1 japan">{kun["hiragana"]}</p>'
+                     )
+                  else:
+                     flashcard_script = flashcard_script.replace(
+                        '<p class="japan">2</p>', f'<p class="japan">{kun["hiragana"]}</p>'
                      )
 
                   flashcard_script = flashcard_script.replace(
                      "<!-- START WORD-->", f"<!-- START {y} WORD-->"
                   ).replace(
-                     '<p class="japan">2</p>', f'<p class="japan">{on["hiragana"]}</p>'
-                  ).replace(
-                     '<p class="romaji"></p>', f'<p class="romaji">{on["romaji"]}</p>'
+                     '<p class="romaji"></p>', f'<p class="romaji">{kun["romaji"]}</p>'
                   ).replace(
                      '</div> <!-- END WORD-->' , f'</div> <!-- END {y} WORD-->'
                   )
@@ -311,4 +318,4 @@ class PageGenScript(Page):
 
       except KeyError as e:
          # Log error
-         self.logText.insert(tk.END, f"KeyError: {str(e)}\n")
+         self.logText.insert(tk.END, f"KeyError: {str(e)}\n", "red_text")

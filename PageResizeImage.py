@@ -40,6 +40,8 @@ class PageResizeImage(Page):
         self.logText = tk.Text(self.labelProgramLog, width=59, height=10, state="normal")
         self.logText.grid(row = 0, column = 0, columnspan = 3,  padx=5,  pady=5)
         self.logText.tag_configure("green_text", foreground="green", font=("calibre", 11 ,"bold"))
+        self.logText.tag_configure("red_text", foreground="red", font=("calibre", 11 ,"bold"))
+        self.logText.tag_configure("orange_text", foreground="orange", font=("calibre", 11 ,"bold"))
 
         self.btnClear = tk.Button(self.labelProgramLog, text = "Clear", font=('calibre', 10), width = 6)
         self.btnClear.grid(row = 1, column = 0, sticky="w", padx = 3)
@@ -50,7 +52,7 @@ class PageResizeImage(Page):
             self.entry.delete(0, tk.END)
             self.entry.insert(0, folderPath)
         else:
-            self.logText.insert(tk.END, "Folder is not exit\n")
+            self.logText.insert(tk.END, "No folder \n", "red_text")
 
     def run(self):
         pathFolder = self.entry.get()
@@ -62,7 +64,7 @@ class PageResizeImage(Page):
             if self.isValidImageExtension(file):
                 self.resize(file, width, height)
             else:
-                self.logText.insert(tk.END, f"file {file} is not image")
+                self.logText.insert(tk.END, f"File {file} is not image\n", "red_text")
 
     def scranFolder(self, path):
         listFilePath = []
@@ -80,13 +82,16 @@ class PageResizeImage(Page):
         image = cv2.imread(filePath)
 
         if image is None:
-            self.logText.insert(tk.END, f"Error loading {filePath}")
+            self.logText.insert(tk.END, f"Error loading: ", "red_text")
+            self.logText.insert(tk.END, f"{filePath}\n")
             return
 
         if image.shape[0] == int(height) and image.shape[1] == int(width):
-            self.logText.insert(tk.END, f"skip {filePath}\n")
+            self.logText.insert(tk.END, f"Skip ", "orange_text")
+            self.logText.insert(tk.END, f"{filePath}\n")
         else:
             size = (int(width), int(height))
             resized_image = cv2.resize(image, size)
             cv2.imwrite(filePath, resized_image)
-            self.logText.insert(tk.END, f"Done {filePath}\n")
+            self.logText.insert(tk.END, f"Done ", "green_text")
+            self.logText.insert(tk.END, f"{filePath}\n")
